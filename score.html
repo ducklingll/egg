@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>掼蛋积分录入与排行榜</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #232526, #414345);
+            color: #fff;
+            font-family: 'Orbitron', Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin-top: 32px;
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 16px #000a;
+        }
+        .score-entry {
+            background: rgba(44, 62, 80, 0.98);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px #0007;
+            padding: 28px 32px 18px 32px;
+            margin-top: 24px;
+            width: 95vw;
+            max-width: 520px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .score-entry label {
+            margin: 8px 0 4px 0;
+            font-size: 1.1rem;
+        }
+        .score-entry select, .score-entry input[type='number'] {
+            font-size: 1.1rem;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 10px;
+            margin-right: 8px;
+        }
+        .score-entry input[type='number'] {
+            width: 80px;
+        }
+        .score-entry button {
+            margin-top: 10px;
+            padding: 8px 32px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #00c3ff, #ffff1c);
+            color: #232526;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #0006;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .score-entry button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px #0008;
+        }
+        .score-table {
+            margin: 40px auto 0 auto;
+            width: 95vw;
+            max-width: 600px;
+            background: rgba(44, 62, 80, 0.98);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px #0007;
+            padding: 24px 0 18px 0;
+        }
+        .score-table h2 {
+            text-align: center;
+            margin: 0 0 18px 0;
+            font-size: 1.3rem;
+            color: #00c3ff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #fff;
+        }
+        th, td {
+            padding: 10px 0;
+            text-align: center;
+        }
+        th {
+            background: #232526;
+            color: #00c3ff;
+            font-size: 1.1rem;
+        }
+        tr:nth-child(even) {
+            background: #2c3e50;
+        }
+        tr:nth-child(odd) {
+            background: #34495e;
+        }
+        @media (max-width: 600px) {
+            .score-entry, .score-table {
+                padding: 12px 2vw 10px 2vw;
+            }
+            table th, table td {
+                font-size: 0.98rem;
+            }
+        }
+        .score-entry div > label {
+            display: inline-block;
+            min-width: 70px;
+            text-align: left;
+        }
+        .score-entry div > input[type='number'] {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <h1>掼蛋积分录入与排行榜</h1>
+    <div class="score-entry">
+        <label for="groupSelect">选择桌号：</label>
+        <select id="groupSelect"></select>
+        <div id="playersArea"></div>
+        <div style="display:flex;gap:12px;">
+            <button id="saveScoreBtn">保存积分</button>
+        </div>
+    </div>
+    <div class="score-table" style="position:relative;">
+        <button id="clearScoreBtn" style="position:absolute;top:18px;right:24px;padding:7px 18px;font-size:0.98rem;border-radius:8px;border:none;background:#ff5e62;color:#fff;font-weight:bold;cursor:pointer;box-shadow:0 2px 8px #0004;z-index:2;">清空积分</button>
+        <h2>积分排行榜</h2>
+        <table>
+            <thead>
+                <tr><th>排名</th><th>姓名</th><th>总积分</th></tr>
+            </thead>
+            <tbody id="scoreRankBody"></tbody>
+        </table>
+    </div>
+    <script src="score.js"></script>
+</body>
+</html> 
