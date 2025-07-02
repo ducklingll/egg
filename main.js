@@ -163,36 +163,50 @@ groupBtn.onclick = function () {
         alert('请输入4的倍数个名字，每行一个');
         return;
     }
-    // 新分组规则：前8名分到前两组
-    let scores = JSON.parse(localStorage.getItem('guandan_scores') || '{}');
-    let rankArr = Object.entries(scores).map(([name, score]) => ({name, score: Number(score)}));
-    rankArr.sort((a, b) => b.score - a.score);
-    let top8 = rankArr.slice(0, 8).map(r => r.name);
-    let rest = names.filter(n => !top8.includes(n));
-    if (rankArr.length > 8) {
-        // 洗牌动画，洗所有人
-        showShuffle(names, function() {
-            let groups = [];
-            let shuffledTop8 = shuffle(top8.slice());
-            groups.push(shuffledTop8.slice(0, 4));
-            groups.push(shuffledTop8.slice(4, 8));
-            let shuffledRest = shuffle(rest);
-            for (let i = 0; i < shuffledRest.length; i += 4) {
-                groups.push(shuffledRest.slice(i, i + 4));
-            }
-            showGroups(groups);
-            localStorage.setItem('guandan_groups', JSON.stringify(groups));
+    // 读取上一次分组
+    let lastGroups = JSON.parse(localStorage.getItem('guandan_groups') || '[]');
+    // 构建每个人的上次同桌集合
+    let lastTableMap = {};
+    lastGroups.forEach(group => {
+        group.forEach(name => {
+            lastTableMap[name] = new Set(group.filter(n => n !== name));
         });
-    } else {
-        showShuffle(names, function(shuffledNames) {
-            const groups = [];
-            for (let i = 0; i < shuffledNames.length; i += 4) {
-                groups.push(shuffledNames.slice(i, i + 4));
+    });
+    // 贪心分组，尽量避免同桌
+    function greedyGroup(names) {
+        let pool = shuffle(names.slice());
+        let groups = [];
+        while (pool.length) {
+            let group = [];
+            for (let i = 0; i < pool.length && group.length < 4; ++i) {
+                let candidate = pool[i];
+                // 检查是否与已选group成员同桌过
+                let conflict = group.some(member => lastTableMap[candidate] && lastTableMap[candidate].has(member));
+                if (!conflict) {
+                    group.push(candidate);
+                }
             }
-            showGroups(groups);
-            localStorage.setItem('guandan_groups', JSON.stringify(groups));
-        });
+            // 如果组不满4人，强行补齐
+            if (group.length < 4) {
+                let need = 4 - group.length;
+                for (let i = 0; i < pool.length && need > 0; ++i) {
+                    if (!group.includes(pool[i])) {
+                        group.push(pool[i]);
+                        need--;
+                    }
+                }
+            }
+            // 从pool移除已分组成员
+            pool = pool.filter(n => !group.includes(n));
+            groups.push(group);
+        }
+        return groups;
     }
+    showShuffle(names, function(shuffledNames) {
+        let groups = greedyGroup(shuffledNames);
+        showGroups(groups);
+        localStorage.setItem('guandan_groups', JSON.stringify(groups));
+    });
 };
 
 rankBtn.onclick = function() {
