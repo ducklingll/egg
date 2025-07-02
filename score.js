@@ -14,45 +14,47 @@ let groups = JSON.parse(localStorage.getItem(GROUPS_KEY)) || [
 
 let scores = JSON.parse(localStorage.getItem(SCORES_KEY)) || {};
 
-const groupSelect = document.getElementById('groupSelect');
-const playersArea = document.getElementById('playersArea');
+const singleScoreArea = document.getElementById('singleScoreArea');
 const saveScoreBtn = document.getElementById('saveScoreBtn');
 const scoreRankBody = document.getElementById('scoreRankBody');
 const clearScoreBtn = document.getElementById('clearScoreBtn');
 
 let clearConfirmStep = 0;
 
-function renderGroupOptions() {
-    groupSelect.innerHTML = '';
-    groups.forEach((g, i) => {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `第${i+1}桌`;
-        groupSelect.appendChild(opt);
-    });
-}
-
-function renderPlayersInputs(idx) {
-    playersArea.innerHTML = '';
-    const group = groups[idx];
-    group.forEach(name => {
-        const div = document.createElement('div');
-        div.style.marginBottom = '8px';
-        div.innerHTML = `<label>${name}：</label><input type='number' min='0' value='0' data-name='${name}' />`;
-        playersArea.appendChild(div);
-    });
+function renderPlayersInputs() {
+    // 获取所有人名（去重）
+    let allNames = Array.from(new Set([].concat(...groups)));
+    singleScoreArea.innerHTML = '';
+    if (allNames.length) {
+        let select = document.createElement('select');
+        select.id = 'singlePlayerSelect';
+        allNames.forEach(name => {
+            let opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            select.appendChild(opt);
+        });
+        let input = document.createElement('input');
+        input.type = 'number';
+        input.min = '0';
+        input.value = '0';
+        input.style.marginLeft = '10px';
+        input.style.width = '80px';
+        input.id = 'singleScoreInput';
+        singleScoreArea.appendChild(select);
+        singleScoreArea.appendChild(input);
+    }
 }
 
 function saveScores() {
-    const idx = groupSelect.value;
-    const group = groups[idx];
-    const inputs = playersArea.querySelectorAll('input');
-    inputs.forEach(input => {
-        const name = input.getAttribute('data-name');
-        const val = parseInt(input.value, 10) || 0;
-        if (!scores[name]) scores[name] = 0;
-        scores[name] += val;
-    });
+    // 只录入选中人的积分
+    const select = document.getElementById('singlePlayerSelect');
+    const input = document.getElementById('singleScoreInput');
+    if (!select || !input) return;
+    const name = select.value;
+    const val = parseInt(input.value, 10) || 0;
+    if (!scores[name]) scores[name] = 0;
+    scores[name] += val;
     localStorage.setItem(SCORES_KEY, JSON.stringify(scores));
     renderRank();
     alert('积分已保存！');
@@ -88,12 +90,8 @@ function clearScores() {
 }
 
 // 初始化
-renderGroupOptions();
-renderPlayersInputs(0);
+renderPlayersInputs();
 renderRank();
 
-groupSelect.onchange = e => {
-    renderPlayersInputs(e.target.value);
-};
 saveScoreBtn.onclick = saveScores;
 clearScoreBtn.onclick = clearScores; 
