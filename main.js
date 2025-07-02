@@ -160,7 +160,7 @@ function showShuffle(names, callback) {
 groupBtn.onclick = function () {
     let names = namesInput.value.split(/\n|,|，/).map(s => s.trim()).filter(Boolean);
     if (names.length % 4 !== 0 || names.length === 0) {
-        alert('请输入4的倍数个名字，每行一个');
+        alert('请输入4的倍数个名字，每行一个11');
         return;
     }
     // 读取上一次分组
